@@ -222,7 +222,7 @@ export function ScrollHeroSection({
             transform: scale(0.9);
             animation: scrollGrow both ease-in-out;
             animation-timeline: --section;
-            animation-range: entry 0% entry 100%;
+            animation-range: entry 50%;
           }
           .scroll-hero-section[data-animate='true'] main section p {
             position: fixed; top: 50%; left: 50%; translate: -50% -50%;
