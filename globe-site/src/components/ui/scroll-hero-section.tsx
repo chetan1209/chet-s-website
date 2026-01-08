@@ -191,6 +191,8 @@ export function ScrollHeroSection({
         .scroll-hero-section main::before {
           content: ''; position: absolute; inset: 0; z-index: -1;
           background: light-dark(#000, #fff); 
+          transform: scale(0.9);
+          transform-origin: 50% 100%;
           border-radius: 1rem 1rem 0 0;
         }
         .scroll-hero-section main section {
@@ -217,11 +219,10 @@ export function ScrollHeroSection({
             view-timeline: --section;
           }
           .scroll-hero-section[data-animate='true'] main::before {
-            transform-origin: 50% 100%;
-            scale: 0.9;
+            transform: scale(0.9);
             animation: scrollGrow both ease-in-out;
             animation-timeline: --section;
-            animation-range: entry 0% entry 100%;
+            animation-range: entry 50%;
           }
           .scroll-hero-section[data-animate='true'] main section p {
             position: fixed; top: 50%; left: 50%; translate: -50% -50%;
@@ -238,11 +239,11 @@ export function ScrollHeroSection({
           @keyframes scrollReveal { from { opacity: 0; } to { opacity: 1; } }
           @keyframes scrollGrow { 
             from {
-              scale: 0.9;
+              transform: scale(0.9);
               border-radius: 1rem 1rem 0 0;
             }
             to { 
-              scale: 1;
+              transform: scale(1);
               border-radius: 0;
             }
           }
