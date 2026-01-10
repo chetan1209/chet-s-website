@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { ContainerScroll } from './container-scroll-animation';
 import Testimonials from './twitter-testimonial-cards';
 
@@ -36,11 +36,6 @@ export function ScrollHeroSection({
   debug = false,
   taglineHTML = '',
 }: ScrollHeroSectionProps) {
-  const [visibleGroups, setVisibleGroups] = useState<boolean[]>(
-    () => items.map(() => false),
-  );
-  const anchorRefs = useRef<(HTMLDivElement | null)[]>([]);
-
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = theme;
@@ -50,58 +45,6 @@ export function ScrollHeroSection({
     root.style.setProperty('--start', `${startVh}vh`);
     root.style.setProperty('--space', `${spaceVh}vh`);
   }, [theme, animate, debug, hue, startVh, spaceVh]);
-
-  useEffect(() => {
-    setVisibleGroups(items.map(() => false));
-  }, [items]);
-
-  useEffect(() => {
-    const anchors = anchorRefs.current;
-    if (!anchors.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const index = anchors.findIndex((anchor) => anchor === entry.target);
-          if (index < 0) return;
-          setVisibleGroups((prev) => {
-            if (prev[index]) return prev;
-            const next = [...prev];
-            next[index] = true;
-            return next;
-          });
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.4,
-        rootMargin: '0px 0px -20% 0px',
-      },
-    );
-
-    anchors.forEach((anchor) => {
-      if (anchor) observer.observe(anchor);
-    });
-
-    return () => observer.disconnect();
-  }, [items]);
-
-  const metricGroups = [
-    {
-      metrics: [
-        '10+ production features',
-        '20+ system components',
-        'multi-stack builds (web · backend · ML)',
-      ],
-    },
-    {
-      metrics: ['4× faster ingestion', '3× log coverage', 'CI/CD automated'],
-    },
-    {
-      metrics: ['1,500+ engineers enabled', '50+ teams', '6 universities', '5M+ users supported'],
-    },
-  ];
 
   return (
     <div
@@ -125,22 +68,8 @@ export function ScrollHeroSection({
               {/* Visible cycling words (aria-hidden) */}
               <ul aria-hidden="true" className="text-left">
                 {items.map((word, i) => (
-                  <li key={word} style={{ ['--i' as any]: i } as React.CSSProperties}>
-                    <span className="phrase">{word}</span>
-                    <div
-                      className={`metrics ${visibleGroups[i] ? 'is-visible' : ''}`}
-                      style={{ ['--group-index' as any]: i } as React.CSSProperties}
-                    >
-                      {metricGroups[i]?.metrics.map((metric, metricIndex) => (
-                        <p
-                          key={metric}
-                          className="metric"
-                          style={{ ['--delay' as any]: `${metricIndex * 90}ms` } as React.CSSProperties}
-                        >
-                          {metric}
-                        </p>
-                      ))}
-                    </div>
+                  <li key={i} style={{ ['--i' as any]: i } as React.CSSProperties}>
+                    {word}
                   </li>
                 ))}
               </ul>
@@ -155,17 +84,6 @@ export function ScrollHeroSection({
       </header>
 
       <main>
-        <div className="scroll-anchors" aria-hidden="true">
-          {items.map((item, index) => (
-            <div
-              key={item}
-              ref={(node) => {
-                anchorRefs.current[index] = node;
-              }}
-              className="scroll-anchor"
-            />
-          ))}
-        </div>
         <ContainerScroll
           titleComponent={
             <div className="text-4xl font-semibold text-black dark:text-white">
@@ -285,17 +203,13 @@ export function ScrollHeroSection({
         .scroll-hero-section ul {
           font-weight: 600; list-style: none; padding: 0; margin: 0;
           position: relative;
-          display: grid;
-          gap: 1.75rem;
         }
         .scroll-hero-section ul li {
           position: relative;
           min-height: 1lh;
-          display: grid;
-          gap: 0.5rem;
         }
 
-        .scroll-hero-section .phrase {
+        .scroll-hero-section li {
           --dimmed: color-mix(in oklch, canvasText, #0000 80%);
           background:
             linear-gradient(
@@ -307,52 +221,6 @@ export function ScrollHeroSection({
           background-attachment: fixed;
           color: #0000;
           background-clip: text;
-        }
-        .scroll-hero-section .phrase {
-          display: inline-block;
-        }
-
-        .scroll-hero-section .metrics {
-          display: grid;
-          gap: 0.35rem;
-          font-weight: 450;
-          font-size: 0.95rem;
-          letter-spacing: 0.01em;
-          color: color-mix(in hsl, canvasText, #0000 35%);
-          opacity: 0;
-          transform: translateY(12px);
-          transition: opacity 520ms cubic-bezier(0.16, 1, 0.3, 1),
-            transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .scroll-hero-section .metrics.is-visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        .scroll-hero-section .metric {
-          margin: 0;
-          transition: opacity 520ms cubic-bezier(0.16, 1, 0.3, 1),
-            transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
-          transition-delay: var(--delay);
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        .scroll-hero-section .metrics.is-visible .metric {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        .scroll-hero-section .metrics .metric:last-child {
-          color: color-mix(in hsl, canvasText, #0000 20%);
-        }
-
-        .scroll-hero-section .scroll-anchors {
-          display: grid;
-          gap: 55vh;
-          padding-top: calc(var(--start) * 0.6);
-          padding-bottom: calc(var(--space) * 0.8);
-          pointer-events: none;
-        }
-        .scroll-hero-section .scroll-anchor {
-          height: 1px;
         }
 
 
@@ -421,43 +289,6 @@ export function ScrollHeroSection({
         /* Debug */
         [data-debug='true'] .scroll-hero-section li { outline: 0.05em dashed currentColor; }
         [data-debug='true'] .scroll-hero-section :is(h2, li:last-of-type) { outline: 0.05em dashed canvasText; }
-
-        @media (min-width: 768px) {
-          .scroll-hero-section .metrics {
-            max-width: 20rem;
-          }
-          .scroll-hero-section ul li:nth-child(1) .metrics {
-            margin-left: 1rem;
-          }
-          .scroll-hero-section ul li:nth-child(2) .metrics {
-            margin-left: 2.2rem;
-          }
-          .scroll-hero-section ul li:nth-child(3) .metrics {
-            margin-left: 0.6rem;
-          }
-        }
-
-        @media (max-width: 767px) {
-          .scroll-hero-section .metrics {
-            font-size: 0.9rem;
-            transform: translateY(6px);
-          }
-          .scroll-hero-section .metric {
-            transform: translateY(6px);
-          }
-          .scroll-hero-section header section:first-of-type {
-            padding-left: 2rem;
-            padding-right: 2rem;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .scroll-hero-section .metrics,
-          .scroll-hero-section .metric {
-            transition-duration: 1ms;
-            transform: none;
-          }
-        }
       `}</style>
     </div>
   );
