@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { ContainerScroll } from './container-scroll-animation';
+import Testimonials from './twitter-testimonial-cards';
 
 type Theme = 'system' | 'light' | 'dark';
 
@@ -54,32 +56,54 @@ export function ScrollHeroSection({
       }
     >
       <header className="content fluid">
-        <section className="content">
-          <h1 className="sr-only sm:not-sr-only">
-            <span aria-hidden="true">you can&nbsp;</span>
-            <span className="sr-only">you can ship things.</span>
-          </h1>
+        <section className="content flex flex-col md:flex-row items-center justify-center gap-12 md:gap-72 w-full max-w-7xl mx-auto">
+          {/* Left side - Text */}
+          <div className="flex-1 flex justify-center md:justify-end">
+            <div>
+              <h1 className="sr-only sm:not-sr-only">
+                <span aria-hidden="true">you can&nbsp;</span>
+                <span className="sr-only">you can ship things.</span>
+              </h1>
 
-          {/* Visible cycling words (aria-hidden) */}
-          <ul aria-hidden="true">
-            {items.map((word, i) => (
-              <li key={i} style={{ ['--i' as any]: i } as React.CSSProperties}>
-                {word}
-              </li>
-            ))}
-          </ul>
+              {/* Visible cycling words (aria-hidden) */}
+              <ul aria-hidden="true" className="text-left">
+                {items.map((word, i) => (
+                  <li key={i} style={{ ['--i' as any]: i } as React.CSSProperties}>
+                    {word}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Right side - Testimonials */}
+          <div className="flex-shrink-0 flex justify-center md:justify-start">
+            <Testimonials />
+          </div>
         </section>
       </header>
 
       <main>
-        <section>
-          {taglineHTML && (
-            <p
-              className="fluid"
-              dangerouslySetInnerHTML={{ __html: taglineHTML }}
-            />
-          )}
-        </section>
+        <ContainerScroll
+          titleComponent={
+            <div className="text-4xl font-semibold text-black dark:text-white">
+              {/* Optional title can go here */}
+            </div>
+          }
+        >
+          <div className="h-full w-full flex items-center justify-center">
+            {taglineHTML ? (
+              <p
+                className="fluid"
+                dangerouslySetInnerHTML={{ __html: taglineHTML }}
+              />
+            ) : (
+              <div className="text-center">
+                {/* Content for the white card */}
+              </div>
+            )}
+          </div>
+        </ContainerScroll>
       </main>
 
       {showFooter && <footer>ʕ⊙ᴥ⊙ʔ Chetan Tripathi &copy; 2025</footer>}
@@ -114,15 +138,18 @@ export function ScrollHeroSection({
 
         /* Screen grid background */
         body::before {
-          --size: 45px; --line: color-mix(in hsl, canvasText, transparent 80%);
+          --size: 45px; 
+          --line: color-mix(in hsl, canvasText, transparent 30%);
           content: '';
-          position: fixed; inset: 0; z-index: -1;
+          position: fixed; 
+          inset: 0; 
+          z-index: 0;
           background:
             linear-gradient(90deg, var(--line) 1px, transparent 1px var(--size))
               calc(var(--size) * 0.36) 50% / var(--size) var(--size),
             linear-gradient(var(--line) 1px, transparent 1px var(--size)) 0%
               calc(var(--size) * 0.32) / var(--size) var(--size);
-          mask: linear-gradient(-20deg, transparent 50%, white);
+          mask: linear-gradient(-20deg, transparent 30%, white);
           pointer-events: none;
         }
 
@@ -148,7 +175,7 @@ export function ScrollHeroSection({
         /* Sticky header logic */
         .scroll-hero-section header {
           --font-level: 4;
-          --font-size-min: 24;
+          --font-size-min: 30;
           position: sticky;
           top: calc((var(--count) - 1) * -1lh);
           line-height: 1.2;
@@ -158,17 +185,28 @@ export function ScrollHeroSection({
           margin-bottom: var(--space);
         }
         .scroll-hero-section header section:first-of-type {
-          display: flex; width: 100%;
-          align-items: start; justify-content: center;
+          display: flex; 
+          width: 100%;
+          align-items: center; 
+          justify-content: center;
           padding-top: calc(var(--start) - 0.5lh);
+          padding-left: 10rem;
+          padding-right: 10rem;
         }
         .scroll-hero-section header section:first-of-type h1 {
-          position: sticky; top: calc(var(--start) - 0.5lh);
-          margin: 0; font-weight: 600;
+          position: sticky; 
+          top: calc(var(--start) - 0.5lh);
+          margin: 0; 
+          font-weight: 600;
         }
 
         .scroll-hero-section ul {
           font-weight: 600; list-style: none; padding: 0; margin: 0;
+          position: relative;
+        }
+        .scroll-hero-section ul li {
+          position: relative;
+          min-height: 1lh;
         }
 
         .scroll-hero-section li {
@@ -185,22 +223,12 @@ export function ScrollHeroSection({
           background-clip: text;
         }
 
+
         .scroll-hero-section main {
-          width: 100%; height: 100vh; position: relative; z-index: 2; color: canvas;
-        }
-        .scroll-hero-section main::before {
-          content: ''; position: absolute; inset: 0; z-index: -1;
-          background: light-dark(#000, #fff); 
-          transform: scale(0.9);
-          transform-origin: 50% 100%;
-          border-radius: 1rem 1rem 0 0;
-        }
-        .scroll-hero-section main section {
-          --font-level: 4; --font-size-min: 20;
-          height: 100%; width: 100%; display: flex; place-items: center;
-        }
-        .scroll-hero-section main section p {
-          margin: 0; font-weight: 600; white-space: nowrap;
+          width: 100%; 
+          position: relative; 
+          z-index: 2; 
+          color: canvas;
         }
         .scroll-hero-section main section a:not(.bear-link) {
           color: var(--accent); text-decoration: none; text-underline-offset: 0.1lh;

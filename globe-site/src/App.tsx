@@ -73,11 +73,6 @@ export default function App() {
         />
       </section>
 
-      {/* Blank White Section - Placeholder for future content */}
-      <section className="min-h-screen bg-background">
-        {/* Content will be added here later */}
-      </section>
-
       {/* 3D Globe Section */}
       <section
         ref={globeSectionRef}
